@@ -1,0 +1,99 @@
+# =============================================================================
+# Data Contract - Learning Example
+# Product: customer_orders
+#
+# This single file describes everything the DAT-EDIP framework needs in order
+# to move "customer_orders" data from a landing Volume, through the Raw layer,
+# validate it, and load it into the Stage layer.
+# =============================================================================
+
+product_name: customer_orders
+description: "Customer order header records dropped daily as CSV files."
+
+owner:
+  developer_name: "Jane Developer"
+  team: "Learning Team"
+  contact_email: "jane.developer@example.com"
+
+# ---------------------------------------------------------------------------
+# Source: where the raw files land before framework processing
+# ---------------------------------------------------------------------------
+source:
+  type: volume
+  catalog: learning_catalog
+  schema: landing
+  volume_name: customer_orders_landing
+  path: /Volumes/learning_catalog/landing/customer_orders_landing/incoming
+  file_format: csv
+  options:
+    header: true
+    delimiter: ","
+
+# ---------------------------------------------------------------------------
+# Target: where the framework copies files to, and where Raw/Stage tables live
+# ---------------------------------------------------------------------------
+target:
+  volume:
+    catalog: learning_catalog
+    schema: landing
+    volume_name: customer_orders_processing
+    path: /Volumes/learning_catalog/landing/customer_orders_processing/inbound
+  raw:
+    catalog: learning_catalog
+    schema: raw
+    table: raw_customer_orders
+  stage:
+    catalog: learning_catalog
+    schema: stage
+    table: stage_customer_orders
+  quarantine:
+    catalog: learning_catalog
+    schema: stage
+    table: stage_customer_orders_quarantine
+
+# ---------------------------------------------------------------------------
+# Column definitions
+# ---------------------------------------------------------------------------
+primary_key:
+  - order_id
+
+columns:
+  - name: order_id
+    data_type: string
+    nullable: false
+    trim: true
+  - name: customer_id
+    data_type: string
+    nullable: false
+    trim: true
+  - name: order_date
+    data_type: date
+    nullable: false
+    trim: false
+  - name: order_amount
+    data_type: double
+    nullable: false
+    trim: false
+  - name: currency_code
+    data_type: string
+    nullable: true
+    trim: true
+  - name: status
+    data_type: string
+    nullable: true
+    trim: true
+
+# ---------------------------------------------------------------------------
+# Validation rules consumed by the Stage Manager
+# ---------------------------------------------------------------------------
+validations:
+  primary_key_check: true
+  not_null_check: true
+  trim_columns: true
+  data_type_check: true
+  allowed_values:
+    status: ["NEW", "SHIPPED", "CANCELLED", "RETURNED"]
+  range_checks:
+    - column: order_amount
+      min: 0
+      max: 1000000
