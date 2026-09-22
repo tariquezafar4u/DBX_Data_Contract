@@ -1,0 +1,107 @@
+# =============================================================================
+# Data Contract - Learning Example
+# Product: customer_orders
+#
+# This single file describes everything the DAT-EDIP framework needs in order
+# to move "customer_orders" data from a landing Volume, through the Raw layer,
+# validate it, and load it into the Stage layer.
+# =============================================================================
+
+product_name: employee
+description: "employee header records dropped daily as CSV files."
+
+owner:
+  developer_name: "Tarique Zafar"
+  team: "Learning Team"
+  contact_email: "tariquezafar4u@gmail.com"
+
+# ---------------------------------------------------------------------------
+# Source: where the raw files land before framework processing
+# ---------------------------------------------------------------------------
+source:
+  type: volume
+  catalog: dbx_ingestion_framework_catalog
+  schema: landing
+  volume_name: employee_landing
+  path: /Volumes/learning_catalog/landing/employee_landing/
+  file_format: csv
+  options:
+    header: true
+    delimiter: ","
+
+# ---------------------------------------------------------------------------
+# Target: where the framework copies files to, and where Raw/Stage tables live
+# ---------------------------------------------------------------------------
+target:
+  volume:
+    catalog: dbx_ingestion_framework_catalog
+    schema: download
+    volume_name: employee_processing
+    path: /Volumes/learning_catalog/landing/employee_processing/
+  raw:
+    catalog: dbx_ingestion_framework_catalog
+    schema: raw
+    table: raw_employee
+  stage:
+    catalog: dbx_ingestion_framework_catalog
+    schema: stage
+    table: stage_employee
+  quarantine:
+    catalog: dbx_ingestion_framework_catalog
+    schema: stage
+    table: stage_employee_quarantine
+
+# ---------------------------------------------------------------------------
+# Column definitions
+# ---------------------------------------------------------------------------
+primary_key:
+  - empno
+
+columns:
+  - name: empno
+    data_type: int
+    nullable: false
+    trim: false
+  - name: ename
+    data_type: string
+    nullable: true
+    trim: true
+  - name: job
+    data_type: string
+    nullable: true
+    trim: true
+  - name: mgr
+    data_type: int
+    nullable: true
+    trim: false
+  - name: hiredate
+    data_type: date
+    nullable: true
+    trim: false
+  - name: sal
+    data_type: int
+    nullable: true
+    trim: false
+  - name: comm
+    data_type: int
+    nullable: true
+    trim: false
+  - name: deptno
+    data_type: int
+    nullable: true
+    trim: false  
+
+# ---------------------------------------------------------------------------
+# Validation rules consumed by the Stage Manager
+# ---------------------------------------------------------------------------
+validations:
+  primary_key_check: true
+  not_null_check: true
+  trim_columns: true
+  data_type_check: true
+  allowed_values:
+    deptno: [10,20,30,40]
+  range_checks:
+    - column: sal
+      min: 0
+      max: 50000
