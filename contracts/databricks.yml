@@ -3,7 +3,7 @@ bundle:
 
 workspace:
   # Framework notebooks default their contract_repo_root widget to this path.
-  file_path: /Workspace/Shared/data_contract_repo
+  file_path: /Workspace/Users/tariquemdzafar@outlook.com/data_contract_repo
 
 targets:
   vscodedev:
