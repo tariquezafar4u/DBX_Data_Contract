@@ -23,7 +23,7 @@ source:
   catalog: dbx_ingestion_framework_catalog
   schema: landing
   volume_name: employee_landing
-  path: /Volumes/dbx_ingestion_framework_catalog/landing/employee_landing/incoming
+  path: /Volumes/dbx_ingestion_framework_catalog/landing/employee/incoming/
   file_format: csv
   options:
     header: true
@@ -37,7 +37,7 @@ target:
     catalog: dbx_ingestion_framework_catalog
     schema: download
     volume_name: employee_processing
-    path: /Volumes/dbx_ingestion_framework_catalog/landing/employee_processing/inbound
+    path: /Volumes/dbx_ingestion_framework_catalog/landing/employee/processing/
   raw:
     catalog: dbx_ingestion_framework_catalog
     schema: raw
