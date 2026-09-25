@@ -79,11 +79,11 @@ columns:
     nullable: true
     trim: false
   - name: sal
-    data_type: int
+    data_type: double
     nullable: true
     trim: false
   - name: comm
-    data_type: int
+    data_type: double
     nullable: true
     trim: false
   - name: deptno
