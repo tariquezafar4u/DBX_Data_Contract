@@ -1,0 +1,88 @@
+# =============================================================================
+# Data Contract - Learning Example
+# Product: department
+#
+# This single file describes everything the DAT-EDIP framework needs in order
+# to move "department" data from a landing Volume, through the Raw layer,
+# validate it, and load it into the Stage layer.
+# =============================================================================
+
+product_name: department
+description: "department header records dropped daily as JSON files."
+
+owner:
+  developer_name: "Tarique Zafar"
+  team: "Learning Team"
+  contact_email: "tariquezafar4u@gmail.com"
+
+# ---------------------------------------------------------------------------
+# Source: where the raw files land before framework processing
+# ---------------------------------------------------------------------------
+source:
+  type: volume
+  catalog: dbx_ingestion_framework_catalog
+  schema: landing
+  volume_name: department_landing
+  path: /Volumes/dbx_ingestion_framework_catalog/landing/department/incoming/
+  file_format: json
+  # options:
+  #   header: true
+  #   delimiter: ","
+
+# ---------------------------------------------------------------------------
+# Target: where the framework copies files to, and where Raw/Stage tables live
+# ---------------------------------------------------------------------------
+target:
+  volume:
+    catalog: dbx_ingestion_framework_catalog
+    schema: download
+    volume_name: department_processing
+    path: /Volumes/dbx_ingestion_framework_catalog/landing/department/processing/
+  raw:
+    catalog: dbx_ingestion_framework_catalog
+    schema: raw
+    table: raw_department
+  stage:
+    catalog: dbx_ingestion_framework_catalog
+    schema: stage
+    table: stage_department
+  quarantine:
+    catalog: dbx_ingestion_framework_catalog
+    schema: stage
+    table: stage_department_quarantine
+
+# ---------------------------------------------------------------------------
+# Column definitions
+# ---------------------------------------------------------------------------
+primary_key:
+  - deptno
+
+columns:
+  - name: deptno
+    data_type: int
+    nullable: false
+    trim: false
+  - name: dname
+    data_type: string
+    nullable: true
+    trim: true
+  - name: loc
+    data_type: string
+    nullable: true
+    trim: true
+
+
+# ---------------------------------------------------------------------------
+# Validation rules consumed by the Stage Manager
+# ---------------------------------------------------------------------------
+validations:
+  primary_key_check: true
+  not_null_check: true
+  trim_columns: true
+  data_type_check: true
+  allowed_values:
+    deptno: [10,20,30,40]
+  # range_checks:
+  #   - column: sal
+  #     min: 0
+  #     max: 50000
