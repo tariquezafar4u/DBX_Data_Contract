@@ -1,0 +1,138 @@
+# =============================================================================
+# Data Contract - Weather API Learning Example
+# Product: weather
+#
+# This contract describes everything the DAT-EDIP framework needs in order
+# to ingest weather data from the OpenWeather API, store it in the Raw layer,
+# validate it, and load valid records into the Stage layer.
+# =============================================================================
+
+product_name: weather
+description: "Weather data retrieved from the OpenWeather API."
+
+owner:
+  developer_name: "Tarique Zafar"
+  team: "Learning Team"
+  contact_email: "tariquezafar4u@gmail.com"
+
+# ---------------------------------------------------------------------------
+# Source: REST API source
+# ---------------------------------------------------------------------------
+source:
+  type: api
+  name: openweather
+  endpoint: https://api.openweathermap.org/data/2.5/weather
+  method: GET
+
+  authentication:
+    type: secret
+    scope: api-scope
+    key: openweather-api-key
+
+  parameters:
+    q: Riyadh
+    units: metric
+
+# ---------------------------------------------------------------------------
+# Target: where Raw/Stage/Quarantine tables live
+# ---------------------------------------------------------------------------
+target:
+  raw:
+    catalog: dbx_ingestion_framework_catalog
+    schema: raw
+    table: raw_weather
+
+  stage:
+    catalog: dbx_ingestion_framework_catalog
+    schema: stage
+    table: stage_weather
+
+  quarantine:
+    catalog: dbx_ingestion_framework_catalog
+    schema: stage
+    table: stage_weather_quarantine
+
+# ---------------------------------------------------------------------------
+# Column definitions
+# ---------------------------------------------------------------------------
+primary_key:
+  - city
+  - observation_timestamp
+
+columns:
+
+  - name: city
+    data_type: string
+    nullable: false
+    trim: true
+
+  - name: temperature
+    data_type: double
+    nullable: false
+    trim: false
+
+  - name: feels_like
+    data_type: double
+    nullable: true
+    trim: false
+
+  - name: humidity
+    data_type: int
+    nullable: false
+    trim: false
+
+  - name: pressure
+    data_type: int
+    nullable: true
+    trim: false
+
+  - name: weather
+    data_type: string
+    nullable: true
+    trim: true
+
+  - name: description
+    data_type: string
+    nullable: true
+    trim: true
+
+  - name: wind_speed
+    data_type: double
+    nullable: true
+    trim: false
+
+  - name: observation_timestamp
+    data_type: timestamp
+    nullable: false
+    trim: false
+
+# ---------------------------------------------------------------------------
+# Validation rules consumed by the Stage Manager
+# ---------------------------------------------------------------------------
+validations:
+
+  primary_key_check: true
+
+  not_null_check: true
+
+  trim_columns: true
+
+  data_type_check: true
+
+  range_checks:
+
+    - column: temperature
+      min: -80
+      max: 80
+
+    - column: humidity
+      min: 0
+      max: 100
+
+    - column: pressure
+      min: 800
+      max: 1200
+
+    - column: wind_speed
+      min: 0
+      max: 150
